@@ -1,6 +1,6 @@
 import java.io.File
 import com.google.common.collect.Sets
-fun main(args: Array<String>) {
+fun main() {
     val filePath = System.getProperty("user.dir")+"""\src\main\kotlin\entrada.txt"""
 
     val file = File(filePath)
@@ -13,13 +13,13 @@ fun main(args: Array<String>) {
             dominos[i-1][0] = line[0].toInt()
             dominos[i-1][1] = line[1].toInt()
         }
-        println(find_equal_sum_sets(dominos))
+        println(encontraSetsDeMesmaSoma(dominos))
         m+=n+1
         n=file.readLines()[m].toInt()
     }
 }
 
-fun find_equal_sum_sets(dominos: Array<IntArray>): String {
+fun encontraSetsDeMesmaSoma(dominos: Array<IntArray>): String {
     val time = System.currentTimeMillis()
     var diferencas = Array(dominos.size){IntArray(2)}
 
@@ -44,8 +44,9 @@ fun find_equal_sum_sets(dominos: Array<IntArray>): String {
             }
             if(somaAbsoluta %2 == 0){
                 var solucaoSets : Array<MutableList<IntArray>>
-                solucaoSets=pseudo_polynomial_partition(combinacao)
+                solucaoSets=particaoPseudoPolinomial(combinacao)
                 if(!solucaoSets[0].isEmpty() && !solucaoSets[1].isEmpty()){
+                    //println("Solucoes: ${solucaoSets[0].joinToString()} e ${solucaoSets[1]}")
                     var soma = 0
                     var solucao = MutableList(0){IntArray(2)}
                     var solucaoIndices= mutableListOf<Int>()
@@ -73,7 +74,15 @@ fun find_equal_sum_sets(dominos: Array<IntArray>): String {
                     if(soma>maiorSoma){
                         maiorSoma=soma
                         melhorSolucao=solucao
-                        dominoDescartado = diferencas.filter { !solucaoIndices.contains(it[1]) }.first()
+                        for (diferenca in diferencas){
+                            if(!solucaoIndices.contains(diferenca[1])){
+                                dominoDescartado=dominos[diferenca[1]]
+                                break
+                            }
+                            else{
+                                dominoDescartado= intArrayOf(0,0)
+                            }
+                        }
                     }
                 }
             }
@@ -86,7 +95,7 @@ fun find_equal_sum_sets(dominos: Array<IntArray>): String {
     }
     else{
         resultado = maiorSoma.toString()+" "
-        if(dominoDescartado[0]!=0 && dominoDescartado[1]!=0){
+        if(dominoDescartado[0] + dominoDescartado[1] != 0){
             if(dominoDescartado[0]>dominoDescartado[1]){
                 resultado+="descartado o dominó " + dominoDescartado[1].toString()+" "+dominoDescartado[0].toString()
             }
@@ -94,13 +103,16 @@ fun find_equal_sum_sets(dominos: Array<IntArray>): String {
                 resultado+="descartado o dominó " + dominoDescartado[0].toString()+" "+dominoDescartado[1].toString()
             }
         }
+        else{
+            resultado+="nenhum dominó descartado"
+        }
     }
-
+    println("\nTempo para encontrar solução: ${System.currentTimeMillis()-time} ms")
     return resultado
 }
 
-fun pseudo_polynomial_partition(set: Set<IntArray>): Array<MutableList<IntArray>> {
-    val valoresSet= set.map { Math.abs(it[0]) }.toSet()
+fun particaoPseudoPolinomial(set: Set<IntArray>): Array<MutableList<IntArray>> {
+    val valoresSet = set.map { Math.abs(it[0]) }
     val soma = valoresSet.sum()/2
     var matriz = Array(valoresSet.size+1){BooleanArray(soma+1)}
     for(i in 0..valoresSet.size){
@@ -121,6 +133,7 @@ fun pseudo_polynomial_partition(set: Set<IntArray>): Array<MutableList<IntArray>
     var set1 = MutableList(0){IntArray(2)}
     var set2 = MutableList(0){IntArray(2)}
     if(matriz[valoresSet.size][soma]) {
+
         var i = valoresSet.size
         var somaAtual = soma
         while (i > 0 && somaAtual >= 0) {
