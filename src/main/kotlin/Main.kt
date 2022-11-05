@@ -1,9 +1,15 @@
 import java.io.File
 import com.google.common.collect.Sets
+import kotlin.math.abs
+
 fun main() {
     val filePath = System.getProperty("user.dir")+"""\src\main\kotlin\entrada.txt"""
+    val outputPath = System.getProperty("user.dir")+"""\src\main\kotlin\saida.txt"""
 
     val file = File(filePath)
+    val outputFile = File(outputPath)
+    outputFile.writeText("")
+
     var n = file.readLines()[0].toInt()
     var m = 0
     while(n!=0){
@@ -13,15 +19,17 @@ fun main() {
             dominos[i-1][0] = line[0].toInt()
             dominos[i-1][1] = line[1].toInt()
         }
-        println(encontraSetsDeMesmaSoma(dominos))
+        val resultado=encontraSetsDeMesmaSoma(dominos)
+        println(resultado)
+        outputFile.appendText(resultado+"\n")
         m+=n+1
         n=file.readLines()[m].toInt()
     }
 }
 
 fun encontraSetsDeMesmaSoma(dominos: Array<IntArray>): String {
-    val time = System.currentTimeMillis()
-    var diferencas = Array(dominos.size){IntArray(2)}
+    //val time = System.currentTimeMillis()
+    val diferencas = Array(dominos.size){IntArray(2)}
 
     for (i in 0 until dominos.size){
         diferencas[i][0] = dominos[i][0] - dominos[i][1]
@@ -35,21 +43,19 @@ fun encontraSetsDeMesmaSoma(dominos: Array<IntArray>): String {
 
 
 
-    for (L in (diferencas.size-1) until (diferencas.size+1)){
-        var combinacoes : Set<Set<IntArray>> = Sets.combinations(diferencas.toSet(), L)
+    for (tamanho in (diferencas.size-1) until (diferencas.size+1)){
+        val combinacoes : Set<Set<IntArray>> = Sets.combinations(diferencas.toSet(), tamanho)
         for(combinacao in combinacoes){
             var somaAbsoluta = 0
             for(valor in combinacao){
                 somaAbsoluta+=Math.abs(valor[0])
             }
             if(somaAbsoluta %2 == 0){
-                var solucaoSets : Array<MutableList<IntArray>>
-                solucaoSets=particaoPseudoPolinomial(combinacao)
+                val solucaoSets : Array<MutableList<IntArray>> = particaoPseudoPolinomial(combinacao)
                 if(!solucaoSets[0].isEmpty() && !solucaoSets[1].isEmpty()){
-                    //println("Solucoes: ${solucaoSets[0].joinToString()} e ${solucaoSets[1]}")
                     var soma = 0
-                    var solucao = MutableList(0){IntArray(2)}
-                    var solucaoIndices= mutableListOf<Int>()
+                    val solucao = MutableList(0){IntArray(2)}
+                    val solucaoIndices= mutableListOf<Int>()
                     for(valor in solucaoSets[0]){
                         solucaoIndices.add(valor[1])
                         if(valor[0]>=0){
@@ -80,7 +86,7 @@ fun encontraSetsDeMesmaSoma(dominos: Array<IntArray>): String {
                                 break
                             }
                             else{
-                                dominoDescartado= intArrayOf(0,0)
+                                dominoDescartado= intArrayOf(-1,-1)
                             }
                         }
                     }
@@ -89,13 +95,13 @@ fun encontraSetsDeMesmaSoma(dominos: Array<IntArray>): String {
          }
      }
 
-    var resultado=""
+    var resultado : String
     if(melhorSolucao.isEmpty()) {
         resultado = "impossível"
     }
     else{
-        resultado = maiorSoma.toString()+" "
-        if(dominoDescartado[0] + dominoDescartado[1] != 0){
+        resultado = "$maiorSoma "
+        if(dominoDescartado[0] + dominoDescartado[1] != -2){
             if(dominoDescartado[0]>dominoDescartado[1]){
                 resultado+="descartado o dominó " + dominoDescartado[1].toString()+" "+dominoDescartado[0].toString()
             }
@@ -107,14 +113,14 @@ fun encontraSetsDeMesmaSoma(dominos: Array<IntArray>): String {
             resultado+="nenhum dominó descartado"
         }
     }
-    println("\nTempo para encontrar solução: ${System.currentTimeMillis()-time} ms")
+    //println("\nTempo para encontrar solução: ${System.currentTimeMillis()-time} ms")
     return resultado
 }
 
 fun particaoPseudoPolinomial(set: Set<IntArray>): Array<MutableList<IntArray>> {
-    val valoresSet = set.map { Math.abs(it[0]) }
+    val valoresSet = set.map { abs(it[0]) }
     val soma = valoresSet.sum()/2
-    var matriz = Array(valoresSet.size+1){BooleanArray(soma+1)}
+    val matriz = Array(valoresSet.size+1){BooleanArray(soma+1)}
     for(i in 0..valoresSet.size){
             matriz[i][0] = true
         }
@@ -130,8 +136,8 @@ fun particaoPseudoPolinomial(set: Set<IntArray>): Array<MutableList<IntArray>> {
             }
         }
     }
-    var set1 = MutableList(0){IntArray(2)}
-    var set2 = MutableList(0){IntArray(2)}
+    val set1 = MutableList(0){IntArray(2)}
+    val set2 = MutableList(0){IntArray(2)}
     if(matriz[valoresSet.size][soma]) {
 
         var i = valoresSet.size
