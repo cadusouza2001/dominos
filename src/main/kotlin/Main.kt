@@ -36,7 +36,8 @@ fun encontraSetsDeMesmaSoma(dominos: Array<IntArray>): String {
         diferencas[i][1] = i
     }
 
-    var melhorSolucao = MutableList(0){IntArray(2)}
+    var existeSolucao = false
+    var existeDominoDescartado = false
     var maiorSoma = 0
     var dominoDescartado = IntArray(2)
 
@@ -52,7 +53,7 @@ fun encontraSetsDeMesmaSoma(dominos: Array<IntArray>): String {
             }
             if(somaAbsoluta %2 == 0){
                 val solucaoSets : Array<MutableList<IntArray>> = particaoPseudoPolinomial(combinacao)
-                if(!solucaoSets[0].isEmpty() && !solucaoSets[1].isEmpty()){
+                if(!solucaoSets[0].isEmpty() || !solucaoSets[1].isEmpty()){
                     var soma = 0
                     val solucao = MutableList(0){IntArray(2)}
                     val solucaoIndices= mutableListOf<Int>()
@@ -77,31 +78,47 @@ fun encontraSetsDeMesmaSoma(dominos: Array<IntArray>): String {
                     for(valor in solucao){
                         soma+=valor[0]
                     }
+
+                    var indiceDominoDescartado = -1
+
+                    for(diferenca in diferencas){
+                        if(!solucaoIndices.contains(diferenca[1])){
+                            indiceDominoDescartado = diferenca[1]
+                            break
+                        }
+                    }
+
                     if(soma>maiorSoma){
                         maiorSoma=soma
-                        melhorSolucao=solucao
-                        for (diferenca in diferencas){
-                            if(!solucaoIndices.contains(diferenca[1])){
-                                dominoDescartado=dominos[diferenca[1]]
-                                break
+                        existeSolucao=true
+                            if(indiceDominoDescartado!=-1){
+                                dominoDescartado=dominos[indiceDominoDescartado]
+                                existeDominoDescartado=true
                             }
                             else{
-                                dominoDescartado= intArrayOf(-1,-1)
+                                existeDominoDescartado=false
                             }
+
+                    }
+
+                    else if(soma==maiorSoma){
+                        if(existeDominoDescartado && achaMinimo(dominos[indiceDominoDescartado])<achaMinimo(dominoDescartado)){
+                            dominoDescartado=dominos[indiceDominoDescartado]
+                        }
                         }
                     }
                 }
             }
          }
-     }
+
 
     var resultado : String
-    if(melhorSolucao.isEmpty()) {
+    if(!existeSolucao) {
         resultado = "impossível"
     }
     else{
         resultado = "$maiorSoma "
-        if(dominoDescartado[0] + dominoDescartado[1] != -2){
+        if(existeDominoDescartado){
             if(dominoDescartado[0]>dominoDescartado[1]){
                 resultado+="descartado o dominó " + dominoDescartado[1].toString()+" "+dominoDescartado[0].toString()
             }
@@ -157,6 +174,10 @@ fun particaoPseudoPolinomial(set: Set<IntArray>): Array<MutableList<IntArray>> {
     }
 
     return arrayOf(set1, set2)
+}
+
+fun achaMinimo(domino: IntArray): Int {
+    return if(domino[0]<domino[1]) domino[0] else domino[1]
 }
 
 
