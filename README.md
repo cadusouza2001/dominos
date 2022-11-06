@@ -67,4 +67,4 @@ Clone o repositório. Para executar o programa, basta acessar o diretório */out
 
 O arquivo *entrada.txt* deve ser salvo conforme o exemplo de entrada acima. Deve ser passada uma linha com um valor X que representa o tamanho do conjunto de dominós e, nas X linhas subsequentes, os dominós desse conjunto, cujos dois valores são escritos separados por um espaço. Para incluir outro conjunto no mesmo arquivo de entrada, basta escrever novamente um único valor na linha representando o tamanho do próximo conjunto e repetir o processo. Para marcar o final da entrada no arquivo, deve-se escrever o valor 0 na última linha.
 
-O programa irá imprimir na tela os resultados para cada conjunto descrito no arquivo de entrada e também gerar um arquivo *saida.txt* com as mesmas impressões para maior facilidade.
+O programa irá imprimir na tela os resultados para cada conjunto descrito no arquivo de entrada e também gerar um arquivo *saida.txt* com as mesmas impressões.
