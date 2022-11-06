@@ -3,8 +3,8 @@ import java.io.File
 import kotlin.math.abs
 
 fun main() {
-    val filePath = System.getProperty("user.dir") + """\src\main\kotlin\entrada.txt"""
-    val outputPath = System.getProperty("user.dir") + """\src\main\kotlin\saida.txt"""
+    val filePath = System.getProperty("user.dir") + """\entrada.txt"""
+    val outputPath = System.getProperty("user.dir") + """\saida.txt"""
 
     val file = File(filePath)
     val outputFile = File(outputPath)
@@ -98,7 +98,7 @@ fun encontraSetsDeMesmaSoma(dominos: Array<IntArray>): String {
 
                     } else if (soma == maiorSoma) {
                         existeSolucao = true
-                        if(indiceDominoDescartado != -1){
+                        if (indiceDominoDescartado != -1) {
                             if (existeDominoDescartado) {
                                 if (achaMinimo(dominos[indiceDominoDescartado]) < achaMinimo(dominoDescartado)) {
                                     dominoDescartado = dominos[indiceDominoDescartado]
@@ -138,16 +138,16 @@ fun encontraSetsDeMesmaSoma(dominos: Array<IntArray>): String {
 
 fun particaoPseudoPolinomial(set: Set<IntArray>): Array<MutableList<IntArray>> {
     val valoresSet = set.map { abs(it[0]) }
-    val soma = valoresSet.sum() / 2
-    val matriz = Array(valoresSet.size + 1) { BooleanArray(soma + 1) }
+    val somaAlvo = valoresSet.sum() / 2
+    val matriz = Array(valoresSet.size + 1) { BooleanArray(somaAlvo + 1) }
     for (i in 0..valoresSet.size) {
         matriz[i][0] = true
     }
-    for (i in 1..soma) {
+    for (i in 1..somaAlvo) {
         matriz[0][i] = false
     }
     for (i in 1..valoresSet.size) {
-        for (j in 1..soma) {
+        for (j in 1..somaAlvo) {
             if (j < valoresSet.elementAt(i - 1)) {
                 matriz[i][j] = matriz[i - 1][j]
             } else {
@@ -157,20 +157,18 @@ fun particaoPseudoPolinomial(set: Set<IntArray>): Array<MutableList<IntArray>> {
     }
     val set1 = MutableList(0) { IntArray(2) }
     val set2 = MutableList(0) { IntArray(2) }
-    if (matriz[valoresSet.size][soma]) {
+    if (matriz[valoresSet.size][somaAlvo]) {
 
         var i = valoresSet.size
-        var somaAtual = soma
-        while (i > 0 && somaAtual >= 0) {
-            if (matriz[i - 1][somaAtual]) {
+        var somaAlvoAtual = somaAlvo
+        while (i > 0 && somaAlvoAtual >= 0) {
+            if (matriz[i - 1][somaAlvoAtual]) {
                 i--
                 set1.add(set.elementAt(i))
             } else {
-                if (matriz[i - 1][somaAtual - valoresSet.elementAt(i - 1)]) {
-                    i--
-                    somaAtual -= valoresSet.elementAt(i)
-                    set2.add(set.elementAt(i))
-                }
+                i--
+                somaAlvoAtual -= valoresSet.elementAt(i)
+                set2.add(set.elementAt(i))
             }
         }
     }
